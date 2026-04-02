@@ -2,6 +2,8 @@
 
 Interactive search panel for Coq in VS Code. Opens a side panel where you can search through Coq's environment with instant results and infinite scroll.
 
+![Demo](demo.gif)
+
 ## Install
 
 Download the `.vsix` from the [releases page](https://github.com/vasnesterov/coq-fastsearch-vscode/releases), then:
