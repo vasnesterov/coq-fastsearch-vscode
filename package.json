@@ -20,14 +20,6 @@
         "command": "coq-fastsearch.open",
         "title": "FastSearch: Open Search Panel"
       }
-    ],
-    "keybindings": [
-      {
-        "command": "coq-fastsearch.open",
-        "key": "ctrl+shift+s",
-        "mac": "cmd+shift+s",
-        "when": "resourceExtname == .v"
-      }
     ]
   },
   "scripts": {
