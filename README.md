@@ -21,17 +21,6 @@ Or in VS Code: Extensions panel -> `...` menu -> "Install from VSIX..."
 3. Wait for "Ready" status (imports from your file are loaded)
 4. Type a query — same syntax as Coq's `Search` command
 
-### Examples
-
-```
-addn
-"mul"
-(_ + _)
-(?a + ?b = ?b + ?a)
-addn -subn
-Nat.add "mul" Nat.odd
-```
-
 ### Restart
 
 Click the "Restart" button to reload imports (e.g., after adding new `Require` lines to your file).
