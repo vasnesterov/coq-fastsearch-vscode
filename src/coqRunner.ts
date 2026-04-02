@@ -80,10 +80,7 @@ export class CoqProcess {
             throw new Error('coqtop not ready');
         }
 
-        let q = query.trim();
-        if (q.includes(' ') && !q.startsWith('(') && !q.startsWith('"')) {
-            q = `(${q})`;
-        }
+        const q = query.trim();
 
         this.cleanResultFile();
 

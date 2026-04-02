@@ -135,9 +135,7 @@ export class SearchPanel {
     .result-name { color: var(--vscode-symbolIcon-functionForeground, #dcdcaa); }
     .result-type { color: var(--vscode-foreground); }
     .error { color: var(--vscode-errorForeground); }
-    #load-more { display: none; margin: 10px 0; padding: 4px 12px; cursor: pointer;
-        background: var(--vscode-button-background); color: var(--vscode-button-foreground);
-        border: none; }
+    #sentinel { height: 1px; }
 </style>
 </head>
 <body>
@@ -147,16 +145,19 @@ export class SearchPanel {
     </div>
     <div id="status">Loading...</div>
     <div id="results"></div>
-    <button id="load-more">Load more</button>
+    <div id="sentinel"></div>
 <script>
     const vscode = acquireVsCodeApi();
     const searchBox = document.getElementById('search-box');
     const statusEl = document.getElementById('status');
     const resultsEl = document.getElementById('results');
-    const loadMoreBtn = document.getElementById('load-more');
+    const sentinel = document.getElementById('sentinel');
     const restartBtn = document.getElementById('restart-btn');
 
-    let allResults = [];
+    let displayedCount = 0;
+    let totalCount = 0;
+    let hasMore = false;
+    let loading = false;
 
     let debounceTimer;
     searchBox.addEventListener('input', () => {
@@ -173,13 +174,17 @@ export class SearchPanel {
         }
     });
 
-    loadMoreBtn.addEventListener('click', () => {
-        vscode.postMessage({ type: 'loadmore' });
-    });
-
     restartBtn.addEventListener('click', () => {
         vscode.postMessage({ type: 'restart' });
     });
+
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+            loading = true;
+            vscode.postMessage({ type: 'loadmore' });
+        }
+    });
+    observer.observe(sentinel);
 
     window.addEventListener('message', (event) => {
         const msg = event.data;
@@ -187,7 +192,6 @@ export class SearchPanel {
             statusEl.textContent = 'Search is loading...';
             searchBox.disabled = true;
             resultsEl.innerHTML = '';
-            loadMoreBtn.style.display = 'none';
         } else if (msg.type === 'ready') {
             statusEl.textContent = 'Ready';
             searchBox.disabled = false;
@@ -195,24 +199,27 @@ export class SearchPanel {
         } else if (msg.type === 'searching') {
             statusEl.textContent = 'Searching...';
             resultsEl.innerHTML = '';
-            loadMoreBtn.style.display = 'none';
+            displayedCount = 0;
+            hasMore = false;
         } else if (msg.type === 'results') {
-            allResults = msg.results;
             resultsEl.innerHTML = '';
-            const total = msg.total || allResults.length;
-            statusEl.textContent = 'Showing ' + allResults.length + ' of ' + total + ' results';
-            appendResults(allResults);
-            loadMoreBtn.style.display = msg.hasMore ? 'block' : 'none';
-        } else if (msg.type === 'more') {
-            allResults = allResults.concat(msg.results);
-            const total = document.getElementById('status').textContent.match(/of (\d+)/);
+            displayedCount = msg.results.length;
+            totalCount = msg.total || msg.results.length;
+            hasMore = msg.hasMore;
+            statusEl.textContent = 'Showing ' + displayedCount + ' of ' + totalCount + ' results';
             appendResults(msg.results);
-            statusEl.textContent = 'Showing ' + allResults.length + ' of ' + (total ? total[1] : allResults.length) + ' results';
-            loadMoreBtn.style.display = msg.hasMore ? 'block' : 'none';
+            loading = false;
+        } else if (msg.type === 'more') {
+            displayedCount += msg.results.length;
+            hasMore = msg.hasMore;
+            appendResults(msg.results);
+            statusEl.textContent = 'Showing ' + displayedCount + ' of ' + totalCount + ' results';
+            loading = false;
         } else if (msg.type === 'error') {
             statusEl.textContent = '';
             resultsEl.innerHTML = '<div class="error">' + escapeHtml(msg.text) + '</div>';
-            loadMoreBtn.style.display = 'none';
+            hasMore = false;
+            loading = false;
         }
     });
 
