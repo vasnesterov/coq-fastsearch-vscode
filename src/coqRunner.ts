@@ -85,9 +85,22 @@ export class CoqProcess {
         this.cleanResultFile();
 
         this.resultFile = path.join(os.tmpdir(), `fastsearch-${Date.now()}`);
-        await this.sendCommand(`Redirect "${this.resultFile}" Search ${q}.`);
+        const output = await this.sendCommand(`Redirect "${this.resultFile}" Search ${q}.`);
 
-        const fullOutput = fs.readFileSync(this.resultFile + '.out', 'utf-8');
+        // Check for Coq errors in the coqtop output
+        const errorMatch = output.match(/^Error:\s*(.*)/m) || output.match(/^Syntax error:\s*(.*)/m);
+        if (errorMatch) {
+            throw new Error(errorMatch[0].trim());
+        }
+
+        const outFile = this.resultFile + '.out';
+        if (!fs.existsSync(outFile)) {
+            // Extract any useful message from coqtop output
+            const msg = output.replace(/^Toplevel input.*\n?/gm, '').replace(/^>.*\n?/gm, '').trim();
+            throw new Error(msg || 'Search failed');
+        }
+
+        const fullOutput = fs.readFileSync(outFile, 'utf-8');
         this.cachedResults = parseResults(fullOutput);
         this.returnedCount = 0;
 
