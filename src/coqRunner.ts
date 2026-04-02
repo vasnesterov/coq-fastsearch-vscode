@@ -158,7 +158,12 @@ export class CoqProcess {
 
     kill() {
         this.cleanResultFile();
+        this.resolveReady = null;
+        this.rejectReady = null;
         if (this.proc) {
+            this.proc.removeAllListeners();
+            this.proc.stdout?.removeAllListeners();
+            this.proc.stderr?.removeAllListeners();
             this.proc.kill();
             this.proc = null;
             this._ready = false;
