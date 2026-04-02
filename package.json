@@ -1,0 +1,37 @@
+{
+  "name": "coq-fastsearch-vscode",
+  "displayName": "Coq FastSearch",
+  "description": "Interactive search panel for Coq",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "coq-fastsearch.open",
+        "title": "FastSearch: Open Search Panel"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "coq-fastsearch.open",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s",
+        "when": "resourceExtname == .v"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.0.0"
+  }
+}
