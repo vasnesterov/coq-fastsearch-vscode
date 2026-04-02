@@ -6,6 +6,11 @@
   "engines": {
     "vscode": "^1.85.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vasnesterov/coq-fastsearch-vscode"
+  },
+  "license": "MIT",
   "categories": ["Other"],
   "activationEvents": [],
   "main": "./dist/extension.js",
