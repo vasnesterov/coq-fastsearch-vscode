@@ -70,7 +70,7 @@ export class CoqProcess {
     private resultFile: string = '';
     private cachedResults: SearchResult[] = [];
     private returnedCount: number = 0;
-    private static readonly PAGE_SIZE = 30;
+    private static readonly PAGE_SIZE = 100;
 
     get total(): number { return this.cachedResults.length; }
     get hasMore(): boolean { return this.returnedCount < this.cachedResults.length; }
